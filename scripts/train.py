@@ -46,10 +46,12 @@ def parse():
     return ap.parse_args()
 
 
-def callbacks(ckpt: Path, extra):
+def callbacks(ckpt: Path, extra, best_so_far=None):
     return [
         tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True, verbose=1),
-        tf.keras.callbacks.ModelCheckpoint(str(ckpt), monitor="val_loss", save_best_only=True, verbose=0),
+        # initial_value_threshold: in stage 2 only overwrite the checkpoint if it beats stage 1
+        tf.keras.callbacks.ModelCheckpoint(str(ckpt), monitor="val_loss", save_best_only=True, verbose=0,
+                                           initial_value_threshold=best_so_far),
         tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.3, patience=2, min_lr=1e-7, verbose=1),
         *extra,
     ]
@@ -101,7 +103,7 @@ def main():
         compile_model(model, a.lr)
         (out / "model_summary.txt").unlink(missing_ok=True)
         model.summary(print_fn=lambda s: open(out / "model_summary.txt", "a").write(s + "\n"))
-        stage1_trainable = [w.name for w in model.trainable_weights]
+        stage1_trainable = [getattr(w, "path", w.name) for w in model.trainable_weights]
         h1 = model.fit(ds_tr, validation_data=ds_va, epochs=a.epochs,
                        callbacks=callbacks(out / "best.keras", manual_cb(0)), verbose=2).history
         n1 = len(h1["loss"])
@@ -112,7 +114,8 @@ def main():
             stage2_layers = unfreeze_last(base, a.model, a.unfreeze_blocks)
             compile_model(model, a.ft_lr)      # recompile so the new trainable flags take effect
             h2 = model.fit(ds_tr, validation_data=ds_va, initial_epoch=n1, epochs=n1 + a.ft_epochs,
-                           callbacks=callbacks(out / "best.keras", manual_cb(0)), verbose=2).history
+                           callbacks=callbacks(out / "best.keras", manual_cb(0), min(h1["val_loss"])),
+                           verbose=2).history
         (out / "trainable_layers.json").write_text(json.dumps(
             {"stage1_trainable_weights": stage1_trainable, "stage2_unfrozen_backbone_layers": stage2_layers}, indent=1))
 

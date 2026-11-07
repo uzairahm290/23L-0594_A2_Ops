@@ -15,13 +15,15 @@ def choose_threshold(y_val, p_val, max_fpr: float = MAX_REAL_FLAGGED) -> tuple[f
     validation images is <= max_fpr, take the one with the highest recall on AI images.
     If no threshold meets the cap (tiny/odd val set) fall back to Youden's J."""
     fpr, tpr, thr = roc_curve(y_val, p_val)
-    ok = np.where(fpr <= max_fpr)[0]
+    ok = np.where((fpr <= max_fpr) & (tpr > 0))[0]
     if len(ok):
         i = ok[np.argmax(tpr[ok])]
         rule = f"max recall s.t. FPR<={max_fpr:.2f}"
     else:
         i = int(np.argmax(tpr - fpr))
         rule = "Youden J (FPR cap unreachable)"
+    if not np.isfinite(thr[i]):        # degenerate model (constant output): use the default
+        return 0.5, rule + " -> degenerate, default 0.5"
     t = float(np.clip(thr[i], 0.0, 1.0))
     return t, rule
 
