@@ -1,0 +1,24 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# data lives in DVC, not git
+/data/raw
+/data/raw.zip
+
+# training outputs (logged to MLflow / DagsHub instead)
+/models/
+/mlruns/
+/mlartifacts/
+/tuner/
+/labs/tuner_toy/
+/toy_loss.png
+*.db
+
+# keep the exported tflite model: Vercel deploys from the repo
+!api/model/visionguard.tflite
+.vercel

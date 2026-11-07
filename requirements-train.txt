@@ -1,0 +1,17 @@
+# Training / experiments. tensorflow-cpu is enough for ~1k images on a laptop.
+# Intel Mac: use `tensorflow==2.16.2` instead of tensorflow-cpu (no newer x86 mac wheels).
+tensorflow-cpu==2.20.*; platform_system != "Darwin"
+tensorflow==2.16.2; platform_system == "Darwin" and platform_machine == "x86_64"
+tensorflow==2.20.*; platform_system == "Darwin" and platform_machine == "arm64"
+keras-tuner==1.4.7
+mlflow==2.22.*          # 2.x: DagsHub's tracking server speaks the 2.x REST API
+dvc[s3]==3.*
+dagshub
+kaggle
+pillow
+numpy<2; platform_system == "Darwin" and platform_machine == "x86_64"
+pandas
+matplotlib
+scikit-learn
+pyyaml
+python-dotenv
