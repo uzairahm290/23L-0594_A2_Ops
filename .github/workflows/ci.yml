@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        # web tests use a fake predictor, so CI never installs TensorFlow (fast, ~30 s)
+        run: pip install -r web/requirements.txt pytest ruff
+      - name: Lint
+        run: ruff check src web api tests --select E,F,W --ignore E501,E402
+      - name: Tests
+        run: pytest -q
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build web image (remote backend, no TF)
+        run: docker build -f web/Dockerfile --build-arg TF_PACKAGE= -t 23l-0594-a2-ops-web:ci .
+      - name: Smoke-test the container
+        # secrets would come from ${{ secrets.NAME }} (Settings > Secrets and variables > Actions), never written here
+        run: |
+          docker run -d --name vg -p 8000:8000 \
+            -e INFERENCE_BACKEND=remote -e MODEL_API_URL=https://example.invalid \
+            -e DATABASE_URL=sqlite:////tmp/ci.db 23l-0594-a2-ops-web:ci
+          sleep 8
+          curl -s localhost:8000/health || true
+          docker exec vg whoami
+          docker logs vg | tail -5
