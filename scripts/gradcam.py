@@ -53,7 +53,7 @@ picks = pd.concat([df[df.label == df.pred].sample(4, random_state=1),
                    df[df.label != df.pred].head(4)])
 fig, axes = plt.subplots(2, len(picks), figsize=(2.6 * len(picks), 5.6))
 for j, (_, r) in enumerate(picks.iterrows()):
-    x = bytes_to_input(Path(r.path).read_bytes())
+    x = bytes_to_input(Path(r.path).read_bytes(), model.input_shape[1])
     cam, p = gradcam(gm, x)
     img = (x[0] + 1) / 2
     axes[0, j].imshow(img)

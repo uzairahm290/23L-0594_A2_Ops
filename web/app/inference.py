@@ -40,12 +40,13 @@ class LocalPredictor:
     def __init__(self, model_path: str, threshold: float, name: str, version: str):
         import tensorflow as tf          # imported here so the remote image needn't ship TF
         self.model = tf.keras.models.load_model(model_path)
+        self.size = int(self.model.input_shape[1])   # follow whatever size the champion was trained at
         self.threshold, self.name, self.version = threshold, name, version
-        self.model.predict(bytes_to_input(_blank_png()), verbose=0)   # warm-up: first call builds the graph
+        self.model.predict(bytes_to_input(_blank_png(), self.size), verbose=0)   # warm-up: first call builds the graph
 
     def predict(self, data: bytes) -> Prediction:
         t0 = time.perf_counter()
-        x = bytes_to_input(data)                     # identical to training preprocessing
+        x = bytes_to_input(data, self.size)          # identical to training preprocessing
         p = float(self.model.predict(x, verbose=0)[0, 0])
         label, conf = _decide(p, self.threshold)
         return Prediction(label, p, conf, self.threshold, self.name, self.version, self.backend,

@@ -24,7 +24,7 @@ threshold = float(run.data.params.get("threshold", 0.5))
 print(f"{NAME}@{ALIAS} -> version {mv.version} (run {mv.run_id[:8]}), threshold {threshold:.3f}")
 
 model = mlflow.tensorflow.load_model(f"models:/{NAME}@{ALIAS}")
-x = bytes_to_input(Path(sys.argv[1]).read_bytes())
+x = bytes_to_input(Path(sys.argv[1]).read_bytes(), model.input_shape[1])   # size from the model itself
 p = float(model.predict(x, verbose=0)[0, 0])
 label = "AI-generated" if p >= threshold else "Real"
 conf = p if p >= threshold else 1 - p

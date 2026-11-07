@@ -15,6 +15,8 @@ from PIL import Image  # noqa: E402
 run_dir = Path(sys.argv[1])
 df = pd.read_csv(run_dir / "test_predictions.csv")
 wrong = df[df.label != df.pred].copy()
+if wrong.empty:
+    sys.exit("no misclassified test images - nothing to analyse")
 wrong["confidence_wrong"] = (wrong.p_ai - 0.5).abs()
 wrong = wrong.sort_values("confidence_wrong", ascending=False).head(10)
 
