@@ -1,0 +1,46 @@
+{
+  "info": {
+    "name": "23L-0594_A2_Ops VisionGuard API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "api", "value": "https://<your-project>.vercel.app" },
+    { "key": "key", "value": "<VG_API_KEY>" },
+    { "key": "flask", "value": "http://localhost:8000" }
+  ],
+  "item": [
+    {
+      "name": "1 Vercel health",
+      "request": { "method": "GET", "url": "{{api}}/health" }
+    },
+    {
+      "name": "2 Vercel predict (with key)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "X-API-Key", "value": "{{key}}" }],
+        "body": { "mode": "formdata", "formdata": [{ "key": "image", "type": "file", "src": "" }] },
+        "url": "{{api}}/predict"
+      }
+    },
+    {
+      "name": "3 Vercel predict (no key -> 401)",
+      "request": {
+        "method": "POST",
+        "body": { "mode": "formdata", "formdata": [{ "key": "image", "type": "file", "src": "" }] },
+        "url": "{{api}}/predict"
+      }
+    },
+    {
+      "name": "4 Flask JSON predict (Flask -> Vercel -> Postgres)",
+      "request": {
+        "method": "POST",
+        "body": { "mode": "formdata", "formdata": [{ "key": "image", "type": "file", "src": "" }] },
+        "url": "{{flask}}/api/predict"
+      }
+    },
+    {
+      "name": "5 Flask health",
+      "request": { "method": "GET", "url": "{{flask}}/health" }
+    }
+  ]
+}

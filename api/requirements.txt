@@ -1,0 +1,4 @@
+flask==3.1.*
+ai-edge-litert==2.*
+numpy<2.2
+pillow==11.*
