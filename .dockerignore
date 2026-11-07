@@ -1,0 +1,22 @@
+# Only web/ and src/visionguard are needed in the build context.
+.git
+.github
+.env
+.env.*
+!.env.example
+.dvc
+data
+models
+mlruns
+mlartifacts
+tuner
+reports
+labs
+api
+docs
+tests
+**/__pycache__
+**/*.pyc
+*.db
+.venv
+venv
