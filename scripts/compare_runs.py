@@ -14,6 +14,8 @@ from visionguard.config import FIG_DIR, PROJECT_NAME, REPORT_DIR  # noqa: E402
 tracking.setup(PROJECT_NAME)
 df = mlflow.search_runs(experiment_names=[PROJECT_NAME])
 df = df[df["metrics.test_f1"].notna()]
+if "params.opt_learning_rate" in df:          # autolog names it differently
+    df["params.lr"] = df["params.lr"].fillna(df["params.opt_learning_rate"])
 cols = {"tags.mlflow.runName": "run", "params.model": "model", "params.lr": "lr",
         "params.augment": "aug", "params.img_size": "size", "params.unfreeze_blocks": "unfrozen",
         "metrics.test_roc_auc": "auc", "metrics.test_f1": "f1", "metrics.test_precision": "precision",
