@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Verdict #{{ rec.id }}{% endblock %}
+{% block body %}
+{% set is_ai = pred.label == 'AI-generated' %}
+<p class="case-label">Examination #{{ rec.id }} · {{ rec.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</p>
+<div class="verdict">
+  <div>
+    <div class="stamp {{ 'ai' if is_ai else 'real' }}">{{ 'AI-made' if is_ai else 'Real' }}</div>
+    <h1 style="font-size:64px">{{ '%.1f'|format(pred.confidence * 100) }}%</h1>
+    <p class="fine">confidence in this label</p>
+  </div>
+  <div>
+    <dl class="facts">
+      <dt>File</dt><dd>{{ rec.filename }} ({{ meta.width }}×{{ meta.height }}, {{ meta.format }})</dd>
+      <dt>p(AI)</dt><dd>{{ '%.4f'|format(pred.p_ai) }}</dd>
+      <dt>Threshold</dt><dd>{{ '%.3f'|format(pred.threshold) }} (tuned on validation to keep false "AI" calls on real photos low)</dd>
+      <dt>Model</dt><dd>{{ pred.model_name }} v{{ pred.model_version }}</dd>
+      <dt>Served by</dt><dd>{{ pred.backend }} · {{ pred.latency_ms }} ms</dd>
+      <dt>SHA-256</dt><dd style="word-break:break-all">{{ rec.image_sha256 }}</dd>
+    </dl>
+    <div class="meter" aria-hidden="true">
+      <b style="left: {{ pred.threshold * 100 }}%"></b>
+      <i style="left: calc({{ pred.p_ai * 100 }}% - 1px)"></i>
+    </div>
+    <p class="fine">◀ real &nbsp;&nbsp;·&nbsp;&nbsp; dashed line = threshold &nbsp;&nbsp;·&nbsp;&nbsp; AI ▶</p>
+  </div>
+</div>
+
+<div class="caveat">
+  <strong>Read before you rely on this</strong>
+  This is one classifier trained on roughly a thousand web images. It hasn't seen every generator,
+  and heavy compression, screenshots, filters, paintings and very small images all fool it.
+  {% if pred.confidence < 0.75 %}This particular call is close to the threshold, so treat it as "unsure".{% endif %}
+  Never use it alone to accuse someone of faking a photo.
+</div>
+<p style="margin-top:28px"><a href="{{ url_for('main.upload_page') }}">← examine another</a> &nbsp; <a href="{{ url_for('main.history') }}">see history →</a></p>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="case-label">New examination</p>
+<h1>Was this picture <em>made</em>, or taken?</h1>
+<p class="lede">Drop an image and VisionGuard estimates whether it came from a camera or a generative model.
+It's a statistical guess from one classifier, not proof, so read the caveat on the result page.</p>
+
+<form class="drop" id="drop" action="{{ url_for('main.predict_page') }}" method="post" enctype="multipart/form-data">
+  <div class="drop-inner">
+    <div class="preview" id="preview">no image yet</div>
+    <div>
+      <label class="case-label" for="image">Exhibit</label><br>
+      <input id="image" name="image" type="file" accept="{% for e in exts %}.{{ e }}{{ ',' if not loop.last }}{% endfor %}" required>
+      <p class="fine">Accepted: {{ exts|join(', ') }} · max {{ max_mb|round(1) }} MB.<br>
+        The file is analysed in memory and discarded. Only its hash and the verdict are logged.</p>
+    </div>
+  </div>
+  <button type="submit">Analyse exhibit</button>
+</form>
+
+<script>
+  const input = document.getElementById('image'), box = document.getElementById('preview'), form = document.getElementById('drop');
+  input.addEventListener('change', () => {
+    const f = input.files[0]; if (!f) return;
+    box.textContent = ''; box.style.backgroundImage = 'url(' + URL.createObjectURL(f) + ')';
+  });
+  ['dragover', 'dragenter'].forEach(t => form.addEventListener(t, e => { e.preventDefault(); form.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(t => form.addEventListener(t, () => form.classList.remove('drag')));
+  form.addEventListener('drop', e => { e.preventDefault(); input.files = e.dataTransfer.files; input.dispatchEvent(new Event('change')); });
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}VisionGuard{% endblock %} · 23L-0594</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="{{ url_for('main.upload_page') }}">VisionGuard<small>image provenance desk</small></a>
+    <nav>
+      <a href="{{ url_for('main.upload_page') }}" class="{{ 'on' if request.endpoint == 'main.upload_page' }}">Examine</a>
+      <a href="{{ url_for('main.history') }}" class="{{ 'on' if request.endpoint == 'main.history' }}">History</a>
+      <a href="{{ url_for('main.health') }}">Health</a>
+    </nav>
+  </header>
+  <main>{% block body %}{% endblock %}</main>
+  <footer>23L-0594_A2_Ops · {{ model_name }} · backend: {{ backend }}</footer>
+</body>
+</html>

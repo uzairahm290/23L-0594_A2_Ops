@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ status }} · {{ title }}{% endblock %}
+{% block body %}
+<p class="err-code">{{ status }}</p>
+<h1>{{ title }}</h1>
+<p class="lede">{{ detail }}</p>
+<p><a href="{{ url_for('main.upload_page') }}">← try another file</a></p>
+{% endblock %}

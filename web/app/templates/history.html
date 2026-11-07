@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block body %}
+<p class="case-label">Case log</p>
+<h1>Every verdict, on record.</h1>
+<p class="lede">What was decided, when, by which model, and how confidently. Newest first.</p>
+
+<div class="tally">
+  <div><b>{{ total }}</b><span class="fine">examinations</span></div>
+  {% for lab, (n, avg) in stats.items() %}
+  <div><b>{{ n }}</b><span class="fine">{{ lab }} · avg conf {{ '%.0f'|format(avg * 100) }}%</span></div>
+  {% endfor %}
+</div>
+
+{% if rows %}
+<table>
+  <thead><tr><th>#</th><th>When (UTC)</th><th>File</th><th>Verdict</th><th>Conf.</th><th class="hide-sm">p(AI)</th><th class="hide-sm">Model</th><th class="hide-sm">Backend</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td title="{{ r.image_sha256 }}">{{ r.filename[:28] }}</td>
+      <td class="{{ 'lab-ai' if r.label == 'AI-generated' else 'lab-real' }}">{{ r.label }}</td>
+      <td>{{ '%.1f'|format(r.confidence * 100) }}%</td>
+      <td class="hide-sm">{{ '%.3f'|format(r.p_ai) }}</td>
+      <td class="hide-sm">{{ r.model_name.split('_')[-1] }} v{{ r.model_version }}</td>
+      <td class="hide-sm">{{ r.backend }} · {{ r.latency_ms }}ms</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="pager">
+  {% if page > 1 %}<a href="?page={{ page - 1 }}">← newer</a>{% endif %}
+  <span class="fine">page {{ page }} / {{ pages }}</span>
+  {% if page < pages %}<a href="?page={{ page + 1 }}">older →</a>{% endif %}
+</div>
+{% else %}
+<div class="empty">No examinations yet. <a href="{{ url_for('main.upload_page') }}">Analyse the first image.</a></div>
+{% endif %}
+{% endblock %}

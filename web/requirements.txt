@@ -1,0 +1,9 @@
+# TensorFlow is NOT listed here: the Dockerfile installs it via the TF_PACKAGE build arg so
+# the remote-backend image can skip it entirely.
+flask==3.1.*
+gunicorn==23.*
+sqlalchemy==2.0.*
+psycopg[binary]==3.2.*
+pillow==11.*
+numpy<2.2
+requests==2.32.*
