@@ -7,6 +7,7 @@ Writes api/model/visionguard.tflite and checks it agrees with the Keras model.
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -17,10 +18,18 @@ src = Path(sys.argv[1])
 dst = ROOT / "api" / "model" / "visionguard.tflite"
 model = tf.keras.models.load_model(src)
 
-conv = tf.lite.TFLiteConverter.from_keras_model(model)
-conv.optimizations = [tf.lite.Optimize.DEFAULT]       # dynamic-range quantisation: ~4x smaller
+# via an exported SavedModel: from_keras_model crashes on EfficientNet under Keras 3
+# ("Failed to infer result type(s)" on a BatchNorm variable read)
+with tempfile.TemporaryDirectory() as tmp:
+    model.export(tmp)
+    conv = tf.lite.TFLiteConverter.from_saved_model(tmp)
+    # float16 weights: half the size, same test verdicts. Dynamic-range int8 was 4.6 MB but
+    # flipped 3/147 test labels on EfficientNet (max |keras - tflite| 0.38)
+    conv.optimizations = [tf.lite.Optimize.DEFAULT]
+    conv.target_spec.supported_types = [tf.float16]
+    tflite_bytes = conv.convert()
 dst.parent.mkdir(parents=True, exist_ok=True)
-dst.write_bytes(conv.convert())
+dst.write_bytes(tflite_bytes)
 
 info = src.parent / "model_info.json"
 if info.exists():

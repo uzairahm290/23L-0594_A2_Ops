@@ -24,7 +24,8 @@ def build_grad_model(model):
         conv = model.get_layer("relu4").output
         return tf.keras.Model(model.inputs, [conv, model.output])
     base = next(l for l in model.layers if isinstance(l, tf.keras.Model))
-    inner = tf.keras.Model(base.inputs, [base.get_layer("out_relu").output, base.output])
+    last_conv = "out_relu" if "out_relu" in [l.name for l in base.layers] else "top_activation"   # MobileNetV2 | EfficientNet
+    inner = tf.keras.Model(base.inputs, [base.get_layer(last_conv).output, base.output])
     x = inp = tf.keras.Input(model.input_shape[1:])
     for layer in model.layers[1:]:
         if layer is base:
