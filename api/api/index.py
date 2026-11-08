@@ -12,6 +12,7 @@ import json
 import os
 import time
 from pathlib import Path
+from urllib.parse import parse_qs
 
 import numpy as np
 from flask import Flask, jsonify, request
@@ -33,6 +34,23 @@ MAX_BYTES = 4 * 1024 * 1024               # Vercel's own body limit is 4.5 MB
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_BYTES + 64 * 1024
+
+
+class _RestorePath:
+    """vercel.json rewrites every path to /api/index?__path=<original>, so Flask would only ever
+    see /api/index. Put the original path back before routing."""
+
+    def __init__(self, wsgi):
+        self.wsgi = wsgi
+
+    def __call__(self, environ, start_response):
+        q = parse_qs(environ.get("QUERY_STRING", ""), keep_blank_values=True)
+        if "__path" in q:
+            environ["PATH_INFO"] = "/" + q["__path"][0].lstrip("/")
+        return self.wsgi(environ, start_response)
+
+
+app.wsgi_app = _RestorePath(app.wsgi_app)
 
 # --- load once per cold start, reused by every warm invocation ---
 _info = json.loads(INFO_FILE.read_text()) if INFO_FILE.exists() else {}
