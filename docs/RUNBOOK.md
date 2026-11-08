@@ -4,7 +4,7 @@ Run these in order on your Mac. Every 📸 is a screenshot the report needs, tag
 Before each terminal screenshot run `whoami; date` so the shot shows your username and the time (the
 assignment asks for that). Keep the browser address bar visible in browser shots.
 
-Placeholders: `<gh>` = your GitHub user (uzairahm290), `<dh>` = your DagsHub user.
+Placeholders: `<gh>` = your GitHub user (uzairahm290), `<dh>` = your DagsHub user (uzairahm290).
 
 ---
 
@@ -13,7 +13,7 @@ Placeholders: `<gh>` = your GitHub user (uzairahm290), `<dh>` = your DagsHub use
 ```bash
 # Python 3.11. TensorFlow 2.16.2 is the last release with Intel-Mac wheels and it needs Python <= 3.12
 brew install python@3.11 node
-git clone https://github.com/uzairahm290/Vision-Guard.git && cd Vision-Guard
+git clone https://github.com/uzairahm290/23L-0594_A2_Ops.git && cd 23L-0594_A2_Ops
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-train.txt -r web/requirements.txt pytest ruff
 cp .env.example .env          # fill it in as you go
@@ -67,10 +67,10 @@ cd ~/dvc-toy && git remote add origin https://dagshub.com/<dh>/23L-0594_A2_Ops-d
 
 **1.4 DVC, apply to the dataset**
 ```bash
-cd ~/23L-0594_A2_Ops
+cd ~/Desktop/Uni\ Projects/Vision-Guard
 dvc init
 dvc remote add -d origin s3://dvc
-dvc remote modify origin endpointurl https://dagshub.com/<dh>/23L-0594_A2_Ops.s3
+dvc remote modify origin endpointurl https://dagshub.com/uzairahm290/23L-0594_A2_Ops.s3
 dvc remote modify origin --local access_key_id <dagshub-token>
 dvc remote modify origin --local secret_access_key <dagshub-token>
 dvc add data/raw
@@ -83,7 +83,7 @@ git push
 📸 **1.4e**: `cat data/raw.dvc` and the `dvc push` output.
 📸 **1.4f**: the DagsHub repo page with the data folder showing the DVC badge.
 
-> DagsHub repo: on dagshub.com choose **Create → New Repository → Connect a repository → GitHub**, pick `23L-0594_A2_Ops`. That one repo then gives you Git mirroring, DVC storage and the MLflow server.
+> DagsHub repo: on dagshub.com choose **Create → New Repository → Connect a repository → GitHub**, pick `23L-0594_A2_Ops` (live at https://dagshub.com/uzairahm290/23L-0594_A2_Ops). That one repo then gives you Git mirroring, DVC storage and the MLflow server.
 
 ---
 
@@ -118,8 +118,8 @@ mlflow ui --port 5000          # open http://127.0.0.1:5000
 **3.2 DagsHub**
 DagsHub repo → **Remote → Experiments** shows the MLflow tracking URI. Avatar → **Settings → Tokens** gives the access token. Put them in `.env`:
 ```
-MLFLOW_TRACKING_URI=https://dagshub.com/<dh>/23L-0594_A2_Ops.mlflow
-MLFLOW_TRACKING_USERNAME=<dh>
+MLFLOW_TRACKING_URI=https://dagshub.com/uzairahm290/23L-0594_A2_Ops.mlflow
+MLFLOW_TRACKING_USERNAME=uzairahm290
 MLFLOW_TRACKING_PASSWORD=<token>
 ```
 ```bash

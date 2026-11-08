@@ -36,7 +36,8 @@ y, yt = y[:10000], yt[:2000]
 model = tf.keras.Sequential([tf.keras.layers.Input((28, 28)), tf.keras.layers.Flatten(),
                              tf.keras.layers.Dense(64, activation="relu"),
                              tf.keras.layers.Dense(10, activation="softmax")])
-model.compile(tf.keras.optimizers.Adam(a.lr), "sparse_categorical_crossentropy", ["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(a.lr), loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
 
 
 class LogEpoch(tf.keras.callbacks.Callback):

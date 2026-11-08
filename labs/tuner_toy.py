@@ -14,8 +14,8 @@ def build(hp):
         tf.keras.layers.Dense(hp.Int("units", 32, 256, step=32), activation="relu"),
         tf.keras.layers.Dense(10, activation="softmax"),
     ])
-    m.compile(tf.keras.optimizers.Adam(hp.Choice("lr", [1e-2, 1e-3, 1e-4])),
-              "sparse_categorical_crossentropy", ["accuracy"])
+    m.compile(optimizer=tf.keras.optimizers.Adam(hp.Choice("lr", [1e-2, 1e-3, 1e-4])),
+              loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     return m
 
 
