@@ -23,7 +23,8 @@ services:
       context: .
       dockerfile: web/Dockerfile
       args:
-        TF_PACKAGE: ${TF_PACKAGE:-tensorflow-cpu==2.20.0}
+        # `-` not `:-`: an empty TF_PACKAGE (remote backend) must stay empty, not fall back to TF
+        TF_PACKAGE: ${TF_PACKAGE-tensorflow-cpu==2.20.0}
     image: 23l-0594-a2-ops-web:latest
     # only the variables this service needs (the DagsHub token in .env never reaches it)
     environment:
