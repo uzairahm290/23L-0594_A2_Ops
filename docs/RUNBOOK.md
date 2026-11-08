@@ -13,7 +13,7 @@ Placeholders: `<gh>` = your GitHub user (uzairahm290), `<dh>` = your DagsHub use
 ```bash
 # Python 3.11. TensorFlow 2.16.2 is the last release with Intel-Mac wheels and it needs Python <= 3.12
 brew install python@3.11 node
-git clone https://github.com/<gh>/23L-0594_A2_Ops.git && cd 23L-0594_A2_Ops
+git clone https://github.com/uzairahm290/Vision-Guard.git && cd Vision-Guard
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-train.txt -r web/requirements.txt pytest ruff
 cp .env.example .env          # fill it in as you go

@@ -1,6 +1,6 @@
 # VisionGuard · 23L-0594_A2_Ops
 
-![ci](https://github.com/uzairahm290/23L-0594_A2_Ops/actions/workflows/ci.yml/badge.svg)
+![ci](https://github.com/uzairahm290/Vision-Guard/actions/workflows/ci.yml/badge.svg)
 
 Tells whether an uploaded image is AI-generated or a real photo. A Keras model (MobileNetV2 fine-tuned on the
 Kaggle *AI Generated Images vs Real Images* set) is tracked in MLflow on DagsHub and served as a TFLite API on Vercel.
