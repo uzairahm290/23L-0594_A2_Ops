@@ -67,8 +67,11 @@ class RemotePredictor:
 
     def predict(self, data: bytes) -> Prediction:
         t0 = time.perf_counter()
-        r = self.session.post(f"{self.url}/predict", files={"image": ("upload", data)},
-                              headers={"X-API-Key": self.key}, timeout=self.timeout)
+        try:
+            r = self.session.post(f"{self.url}/predict", files={"image": ("upload", data)},
+                                  headers={"X-API-Key": self.key}, timeout=self.timeout)
+        except requests.RequestException as e:      # timeout / DNS / TLS: same 502 path as a bad status
+            raise RemoteModelError(502, type(e).__name__) from e
         if r.status_code != 200:
             raise RemoteModelError(r.status_code, r.text[:200])
         j = r.json()
